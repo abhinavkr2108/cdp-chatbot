@@ -14,6 +14,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import axios from "axios";
 
 const CDP_OPTIONS = [
   { label: "Segment", value: "https://segment.com/docs/" },
@@ -41,21 +42,15 @@ export default function ChatInterface() {
       addMessage(userMessage);
       setInput("");
 
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-        }),
+      const response = await axios.post("/api/chat", {
+        messages: [...messages, userMessage],
       });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
+      const data = response.data;
       if (!data.content) {
         throw new Error("Invalid response format from server");
       }
